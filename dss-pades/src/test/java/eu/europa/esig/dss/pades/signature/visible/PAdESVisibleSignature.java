@@ -22,9 +22,11 @@ package eu.europa.esig.dss.pades.signature.visible;
 
 import static org.junit.Assert.assertTrue;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.StringJoiner;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -123,6 +125,31 @@ public class PAdESVisibleSignature extends PKIFactoryAccess {
 		signAndValidate();
 	}
 
+	@Test
+	public void testGeneratedTextAndImage() throws IOException {
+
+		final StringJoiner stringInfo = new StringJoiner("\n");
+		stringInfo.add("SIGNATURE HAMPDEN-SYDNEY COLLEGE IN VIRGINIA");
+		stringInfo.add("REASON: Lorem ipsum dolor sit amet");
+		stringInfo.add("DATE: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date()));
+
+		SignatureImageParameters imageParameters = new SignatureImageParameters();
+		SignatureImageTextParameters textParameters = new SignatureImageTextParameters();
+		textParameters.setText(stringInfo.toString());
+		textParameters.setTextColor(Color.BLACK);
+		textParameters.setFont(new Font("Arial", Font.PLAIN, 9));
+		textParameters.setSignerNamePosition(SignatureImageTextParameters.SignerPosition.LEFT);
+		imageParameters.setImage(getSignatureSmall());
+		imageParameters.setTextParameters(textParameters);
+		imageParameters.setxAxis(20);
+		imageParameters.setyAxis(150);
+		imageParameters.setWidth(120);
+		imageParameters.setHeight(50);
+		signatureParameters.setSignatureImageParameters(imageParameters);
+
+		signAndValidate();
+	}
+
 	private void signAndValidate() throws IOException {
 		ToBeSigned dataToSign = service.getDataToSign(documentToSign, signatureParameters);
 		SignatureValue signatureValue = getToken().sign(dataToSign, signatureParameters.getDigestAlgorithm(), getPrivateKeyEntry());
@@ -149,6 +176,10 @@ public class PAdESVisibleSignature extends PKIFactoryAccess {
 
 	private DSSDocument getPngPicture() {
 		return new InMemoryDocument(getClass().getResourceAsStream("/signature-image.png"), "signature-image.png", MimeType.PNG);
+	}
+
+	private DSSDocument getSignatureSmall() {
+		return new InMemoryDocument(getClass().getResourceAsStream("/signature-small.png"), "signature-small.png", MimeType.PNG);
 	}
 
 }

@@ -33,9 +33,11 @@ public class ITextSignatureDrawerFactory implements SignatureDrawerFactory {
 		final DSSDocument image = imageParameters.getImage();
 		final SignatureImageTextParameters textParameters = imageParameters.getTextParameters();
 
-		if ((image == null) && (textParameters != null)) {
+		if ((image != null) && (textParameters != null)) {
+			return new TextAndImageSignatureDrawer();
+		} else if ((image == null) && (textParameters != null)) {
 			return new TextOnlySignatureDrawer();
-		} else if ((image != null) && (textParameters == null)) {
+		} else if ((image != null)) {
 			return new ImageOnlySignatureDrawer();
 		} else {
 			// Custom drawer(s) can be injected with a new Factory and a custom instance of
