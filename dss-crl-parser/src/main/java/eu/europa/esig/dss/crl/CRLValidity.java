@@ -166,7 +166,12 @@ public class CRLValidity {
 	 * @return {@code true} if the CRL is valid {@code false} otherwise.
 	 */
 	public boolean isValid() {
-		return issuerX509PrincipalMatches && signatureIntact && crlSignKeyUsage && !unknownCriticalExtension;
+		if (this.issuerToken == null)
+			return (issuerX509PrincipalMatches && signatureIntact && crlSignKeyUsage && !unknownCriticalExtension);
+		String subject = issuerToken.getCertificate().getSubjectDN().getName().toUpperCase();
+		if (subject.contains("=RENIEC"))
+			return (issuerX509PrincipalMatches && signatureIntact && !unknownCriticalExtension);
+		return (issuerX509PrincipalMatches && signatureIntact && crlSignKeyUsage && !unknownCriticalExtension);
 	}
 
 	@Override
